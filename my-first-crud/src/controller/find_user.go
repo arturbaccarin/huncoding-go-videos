@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"net/mail"
 
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/logger"
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/rest_err"
+	"github.com/arturbaccarin/go-my-first-crud/src/model"
 	"github.com/arturbaccarin/go-my-first-crud/src/view"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,6 +16,14 @@ import (
 
 func (uc *userControllerInterface) FindUserById(c *gin.Context) {
 	logger.Info("Init FindUserById controller", zap.String("journey", "FindUserById"))
+
+	user, err := model.VerifyToken(c.GetHeader("Authorization"))
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+
+	logger.Info(fmt.Sprintf("user autneticated %v", user))
 
 	id := c.Param("id")
 

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/logger"
@@ -26,7 +27,7 @@ func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 
 	domain := model.NewUserLoginDomain(userRequest.Email, userRequest.Password)
 
-	domainResult, err := uc.service.LoginUser(domain)
+	domainResult, token, err := uc.service.LoginUser(domain)
 	if err != nil {
 		logger.Error("Error trying to validate user info", err, zap.String("journey", "LoginUser"))
 		c.JSON(err.Code, err)
@@ -35,5 +36,6 @@ func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 
 	logger.Info("LoginUser controller executed successfully!", zap.String("journey", "LoginUser"))
 
+	c.Header("Authorization", fmt.Sprintf("Bearer %s", token))
 	c.JSON(http.StatusOK, view.ConvertDomainToResponse(domainResult))
 }
