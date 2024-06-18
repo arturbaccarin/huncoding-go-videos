@@ -32,7 +32,7 @@ func (ur *userRepository) UpdateUser(id string, userDomain model.UserDomainInter
 		return rest_err.NewInternalServerError(err.Error())
 	}
 
-	logger.Info("Init UpdateUser succes!", zap.String("userId", value.Id.Hex()), zap.String("journey", "UpdateUser"))
+	logger.Info("Init UpdateUser succes!", zap.String("userId", objectId.Hex()), zap.String("journey", "UpdateUser"))
 
 	return nil
 }

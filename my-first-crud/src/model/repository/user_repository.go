@@ -15,6 +15,7 @@ type UserRepository interface {
 	FindUserByEmail(string) (model.UserDomainInterface, *rest_err.RestErr)
 	FindUserById(string) (model.UserDomainInterface, *rest_err.RestErr)
 	UpdateUser(string, model.UserDomainInterface) *rest_err.RestErr
+	DeleteUser(string) *rest_err.RestErr
 }
 
 func NewUserRepository(databaseConnection *mongo.Database) UserRepository {

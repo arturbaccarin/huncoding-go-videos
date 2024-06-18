@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/logger"
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/rest_err"
@@ -16,10 +15,9 @@ import (
 
 func (uc *userControllerInterface) UpdateUserById(c *gin.Context) {
 	logger.Info("Init UpdateUserById controller", zap.String("journey", "UpdateUserById"))
-	var userRequest request.UserUpdateRequest
 
-	id := c.Param("id")
-	if err := c.ShouldBindJSON(&userRequest); err != nil || strings.TrimSpace(id) == "" {
+	var userRequest request.UserUpdateRequest
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		logger.Error("Error trying to validate user info", err, zap.String("journey", "UpdateUserById"))
 		errRest := validation.ValidateUserError(err)
 
@@ -27,6 +25,7 @@ func (uc *userControllerInterface) UpdateUserById(c *gin.Context) {
 		return
 	}
 
+	id := c.Param("id")
 	if _, err := primitive.ObjectIDFromHex(id); err != nil {
 		logger.Error("Error UpdateUserById controller", err, zap.String("journey", "UpdateUserById"))
 
