@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
 )
 
-func TestUserRepository_CreateUser(t *testing.T) {
+func TestUserRepository_UpdateUser(t *testing.T) {
 	databaseName := "user_database_test"
 	collectionName := "user_collection_test"
 
@@ -20,7 +20,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 
 	mtestDb := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
-	mtestDb.Run("when_sending_a_valid_domain_returns_success", func(mt *mtest.T) {
+	mtestDb.Run("when_sending_a_valid_user_returns_success", func(mt *mtest.T) {
 		mt.AddMockResponses(bson.D{
 			{Key: "ok", Value: 1},
 			{Key: "n", Value: 1},
@@ -30,14 +30,13 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		databaseMock := mt.Client.Database(databaseName)
 
 		repo := NewUserRepository(databaseMock)
-		userDomain, err := repo.CreateUser(model.NewUserDomain("test@test.com", "test", "name", 98))
-		_, errId := primitive.ObjectIDFromHex(userDomain.GetId())
+
+		domain := model.NewUserDomain("test@test.com", "test", "name", 98)
+		domain.SetId(primitive.NewObjectID().Hex())
+
+		err := repo.UpdateUser(domain.GetId(), domain)
 
 		assert.Nil(t, err)
-		assert.Nil(t, errId)
-		assert.EqualValues(t, userDomain.GetEmail(), "test@test.com")
-		assert.EqualValues(t, userDomain.GetName(), "name")
-		assert.EqualValues(t, userDomain.GetAge(), 98)
 	})
 
 	mtestDb.Run("return_error_from_database", func(mt *mtest.T) {
@@ -48,7 +47,11 @@ func TestUserRepository_CreateUser(t *testing.T) {
 		databaseMock := mt.Client.Database(databaseName)
 
 		repo := NewUserRepository(databaseMock)
-		_, err := repo.CreateUser(model.NewUserDomain("test@test.com", "test", "name", 98))
+
+		domain := model.NewUserDomain("test@test.com", "test", "name", 98)
+		domain.SetId(primitive.NewObjectID().Hex())
+
+		err := repo.UpdateUser(domain.GetId(), domain)
 
 		assert.NotNil(t, err)
 	})
