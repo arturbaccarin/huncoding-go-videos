@@ -17,7 +17,7 @@ func (ur *userRepository) UpdateUser(id string, userDomain model.UserDomainInter
 
 	logger.Info("Init UpdateUser repository", zap.String("journey", "UpdateUser"))
 
-	collectionName := os.Getenv(MONGODB_USER_COLLECTION)
+	collectionName := os.Getenv(MONGODB_USER_DB)
 	collection := ur.databaseConnection.Collection(collectionName)
 
 	value := converter.ConvertDomainToEntity(userDomain)
