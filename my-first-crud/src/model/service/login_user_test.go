@@ -6,7 +6,7 @@ import (
 
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/rest_err"
 	"github.com/arturbaccarin/go-my-first-crud/src/model"
-	mock "github.com/arturbaccarin/go-my-first-crud/src/test/mocks"
+	"github.com/arturbaccarin/go-my-first-crud/src/test/mock"
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/arturbaccarin/go-my-first-crud/src/configuration/rest_err"
-	mock "github.com/arturbaccarin/go-my-first-crud/src/test/mocks"
+	"github.com/arturbaccarin/go-my-first-crud/src/test/mock"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/mock/gomock"
