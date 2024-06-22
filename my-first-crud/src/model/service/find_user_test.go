@@ -14,6 +14,7 @@ import (
 )
 
 // mockgen -source=src/model/repository/user_repository.go -destination=src/test/mocks/user_repository_mock.go -package=mock
+// mockgen -source=src/model/user_domain_interface.go -destination=src/test/mocks/user_domain_interface_mock.go -package=mock
 
 func TestUserDomainService_FindUserByIdServices(t *testing.T) {
 
