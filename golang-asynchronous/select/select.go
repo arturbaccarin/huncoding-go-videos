@@ -14,7 +14,8 @@ func getValueFromChannel(ch chan<- string, duration time.Duration) {
 
 func main() {
 
-	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	_ = cancel
 
 	ch := make(chan string)
 	go getValueFromChannel(ch, 2*time.Second)
