@@ -1,0 +1,23 @@
+Por que o go build?
+
+1. Gerar executável do projeto;
+2. Gerar um Dockerfile;
+3. Quer usar o executável para um pipeline porque o exe do Go roda em Linux e em Windows;
+4. Verificar se o código está com algum erro.
+
+> go build main.go (sem precisar executar o código)
+
+Flags:
+-o: nome do executável
+> go build -o huncoding
+
+-ldflags: utilizar outros parâmetros 
+> go build -ldflags="-o 'abc'" main.go
+
+> go build -ldflags="-X 'main.YoutubeChannel=honcoding' " (mudar variável dentro do código em tempo de build)
+
+-race: para verificar se o código tem problema de concorrência
+> go build -race .
+
+-v -a: -v (verbose para ver tudo que o build tá fazendo) (-a: rebuildar o projeto todo inteiro, porque ele reaproveita coisas)
+> go build -v -a
