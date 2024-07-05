@@ -38,11 +38,11 @@ func main() {
 }
 
 func MidJwt(context *gin.Context) {
-	
-	if headerAuth := context.Request.Header.Get("Authorization") {
-		if !strings.HasPrefix(headerAuth, "Bearer ") {
-			context.String(http.StatusBadRequest, "invalid token")
-			context.Abort()
-		}
+
+	headerAuth := context.Request.Header.Get("Authorization")
+	if !strings.HasPrefix(headerAuth, "Bearer ") {
+		context.String(http.StatusBadRequest, "invalid token")
+		context.Abort()
 	}
+
 }
