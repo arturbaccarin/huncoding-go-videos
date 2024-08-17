@@ -1,0 +1,13 @@
+https://youtu.be/wSpGkpMmtDk?list=PLm-xZWCprwYTEKad8bM1H0kxHxDMlzXeO
+
+"Programadores ruins se preocupam com o código.
+Bons programadores se preocupam
+com as estruturas de dados e seu relacionamento."
+
+Soluções eficientes e otimizadas para problemas.
+
+Compreender DSA permite compreender as declarações
+do problema em um nível mais profundo e criar
+soluções lógicas para resolvê-las.
+
+Linear x Não-Linear

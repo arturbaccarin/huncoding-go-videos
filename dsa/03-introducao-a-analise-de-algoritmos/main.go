@@ -1,5 +1,7 @@
 package main
 
+// Não existe apenas uma forma de resolver um certo problema.
+
 func naturalNumbers(n int) (sum int) {
 	for i := 1; i <= n; i++ {
 		sum += i
