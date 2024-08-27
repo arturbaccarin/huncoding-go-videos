@@ -24,6 +24,18 @@ func (n *Node) printList() {
 	fmt.Println("null")
 }
 
+func (n *Node) findLength() int {
+	count := 0
+	current := n
+
+	for current != nil {
+		count++
+		current = current.next
+	}
+
+	return count
+}
+
 func main() {
 	nodes := Node{
 		data: "1",
@@ -37,4 +49,12 @@ func main() {
 	}
 
 	nodes.printList()
+	fmt.Println(nodes.findLength())
+}
+
+// errado
+func (n *Node) insertAtBeginning(data string) {
+	newNode := &Node{data: data, next: n}
+	n = newNode
+	// Assignment to the method receiver propagates only to calles but no to callers
 }
