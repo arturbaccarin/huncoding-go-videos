@@ -30,14 +30,15 @@ func (dl *DoublyLinkedList) removeNodeAtBeginning() {
 		return
 	}
 
-	temp := dl.Head
 	if dl.Head == dl.Tail {
 		dl.Tail = nil
 		dl.Head = nil
-	} else {
-		dl.Head.Next.Previous = nil
+		return
 	}
 
-	dl.Head = dl.Head.Next
-	temp.Next = nil
+	dl.Tail.Previous.Next = nil
+	dl.Tail.Previous = nil
+	dl.Tail = dl.Tail.Previous
+
+	dl.Lenght--
 }
