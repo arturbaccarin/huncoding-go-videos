@@ -5,6 +5,7 @@ type CircularLinkedList struct {
 	Last   *ListNode
 }
 
+// commit of the day, I'm sorry. Today is a commentary
 type ListNode struct {
 	Data int
 	Next *ListNode
