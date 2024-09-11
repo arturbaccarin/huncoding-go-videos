@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// não usa o head
-	cl := &CircularLinkedList{
+	_ = &CircularLinkedList{
 		Length: 1,
 		Last:   listNode,
 	}
