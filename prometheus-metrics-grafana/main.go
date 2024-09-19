@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+// this is the commit of the day :)
 var (
 	httpRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
