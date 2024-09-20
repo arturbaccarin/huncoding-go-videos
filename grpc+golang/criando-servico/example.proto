@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package main;
+
+option go_package = "/example";
+
+service ExampleService {
+    rpc GetExample (ExampleRequest) returns (ExampleResponse);
+}
+
+message ExampleRequest {
+    string id = 1;
+}
+
+message ExampleResponse {
+    string message = 1;
+}
+
+// protoc --go_out=. --go-grpc_out=. ./example.proto
