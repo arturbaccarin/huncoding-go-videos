@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func main() {
+func main2() {
 	var g errgroup.Group
 
 	urls := []string{
