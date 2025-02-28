@@ -1,0 +1,7 @@
+Starting https://youtu.be/TnG6r4861Z4
+
+// kubebuilder init --domain example.com --repo kubernetes-operator
+// kubebuilder create api --group app --version v1alpha1 --kind MyApp
+
+// only configuratio today
+// still in configuration
