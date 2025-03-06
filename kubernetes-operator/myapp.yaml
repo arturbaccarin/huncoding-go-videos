@@ -1,0 +1,7 @@
+apiVersion: "app.example.com/v1alpha1"
+kind: MyApp
+metadata:
+  name: myapp-sample
+spec:
+  replicas: 2
+  image: "myapp:latest

@@ -47,9 +47,21 @@ type MyAppReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.20.2/pkg/reconcile
 func (r *MyAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
 	// TODO(user): your logic here
+	myApp := &appv1alpha1.MyApp{}
+
+	err := r.Get(ctx, req.NamespacedName, myApp)
+	if err != nil {
+		log.Error(err, "error trying to reconcile object, namespaceName=%s", req.NamespacedName)
+		return ctrl.Result{}, err
+	}
+
+	log.Info("reconciling myapp, name=%s, apiVersion=%s, kind=%s",
+		myApp.Name,
+		myApp.APIVersion,
+		myApp.Kind)
 
 	return ctrl.Result{}, nil
 }
@@ -61,3 +73,9 @@ func (r *MyAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Named("myapp").
 		Complete(r)
 }
+
+/*
+make generate
+make manifests
+make installl
+*/
