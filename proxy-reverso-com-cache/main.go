@@ -3,6 +3,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"fmt"
 	"io"
 	"log"
 	"math/rand"
@@ -73,6 +75,36 @@ func (c *Cache) CleanUp() {
 	}
 }
 
+func (rp *ReverseProxy) cacheMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		key := fmt.Sprintf("%s-%x", r.URL.Path, sha256.Sum256([]byte(r.URL.RawQuery)))
+
+		if cache, ok := rp.cache.Get(key); ok {
+			w.Write(cache)
+			fmt.Printf("Cache hit: %s\n", r.URL.Path)
+			return
+		}
+
+		recorder := &responseRecorder{
+			ResponseWriter: w,
+			body:           bytes.NewBuffer(nil),
+		}
+		next(recorder, r)
+
+		rp.cache.Set(key, recorder.body.Bytes(), 5*time.Second)
+	}
+}
+
+type responseRecorder struct {
+	http.ResponseWriter
+	body *bytes.Buffer
+}
+
+func (r *responseRecorder) Write(b []byte) (int, error) {
+	r.body.Write(b)
+	return r.ResponseWriter.Write(b)
+}
+
 func (rp *ReverseProxy) selectBackend(path string) (string, bool) {
 	backend, exists := rp.routes[path]
 	if !exists || len(backend) == 0 {
@@ -134,9 +166,10 @@ func (rp *ReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+	proxy := NewReverseProxy()
 
 	rp := NewReverseProxy()
-	http.Handle("/", rp)
+	http.HandleFunc("/", proxy.cacheMiddleware(rp.ServeHTTP))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
