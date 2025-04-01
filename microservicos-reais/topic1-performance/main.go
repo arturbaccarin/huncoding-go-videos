@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"os/signal"
 	"runtime/pprof"
 	"syscall"
 	"time"
@@ -35,7 +36,7 @@ func main() {
 	}
 
 	stopChan := make(chan os.Signal, 1)
-	signalNotify(stopChan, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		log.Printf("Listening on http://localhost:8080")
@@ -76,4 +77,17 @@ func computeHandler(w http.ResponseWriter, r *http.Request) {
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+func fib(n int) int {
+	if n <= 1 {
+		return n
+	}
+
+	a, b := 0, 1
+	for i := 2; i <= n; i++ {
+		a, b = b, a+b
+	}
+
+	return a
 }
