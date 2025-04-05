@@ -94,3 +94,5 @@ func initTracing() (*trace.TracerProvider, error) {
 	otel.SetTracerProvider(tp)
 	return tp, nil
 }
+
+// commit of the day
