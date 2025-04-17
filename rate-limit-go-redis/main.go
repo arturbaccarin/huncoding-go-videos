@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -28,12 +29,29 @@ func NewRateLimiter(client *redis.Client, limit int, window time.Duration) *Rate
 }
 
 func (rl *RateLimiter) Allow(key string) bool {
-	return false
+	pipe := rl.client.TxPipeline()
+
+	incr := pipe.Incr(rl.context, key)
+	pipe.Expire(rl.context, key, rl.window)
+
+	_, err := pipe.Exec(rl.context)
+	if err != nil {
+		// métrica para saber que foi erro do redis
+		return false
+	}
+
+	return incr.Val() <= int64(rl.limit)
 }
 
-func rateLimiter(rl *RateLimiter, next http.Handler) http.Handler {
+func rateLimiterMiddleware(rl *RateLimiter, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		clientIP := r.RemoteAddr
+		clientIP, _, _ := net.SplitHostPort(r.RemoteAddr)
+		if !rl.Allow(clientIP) {
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 
@@ -50,5 +68,9 @@ func main() {
 		fmt.Fprintf(w, "Hello, world!\n")
 	})
 
-	http.ListenAndServe(":8080", nil)
+	handler := rateLimiterMiddleware(rateLimiter, router)
+
+	http.ListenAndServe(":8080", handler)
 }
+
+// docker run -d --name redislimiter -p 6379:6379 redis:latest
