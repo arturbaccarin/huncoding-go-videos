@@ -1,5 +1,5 @@
 // https://youtu.be/8JOrxl0KkDs
-// commit of the day :)
+// 6:17
 package main
 
 import (
@@ -18,7 +18,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 
-			atomic.AddInt64(&counter, 1)
+			atomic.AddInt64(&counter, 1) // a demora é a mesma, mas com menos uso de máquina
 		}()
 	}
 
