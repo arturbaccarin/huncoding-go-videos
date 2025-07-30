@@ -2,7 +2,7 @@
 // 12:00
 package main
 
-// commit of the day - sorry
+// article day
 
 import (
 	"flag"
