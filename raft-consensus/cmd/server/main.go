@@ -1,5 +1,5 @@
 // https://youtu.be/PJr5BT73u38
-// 12:00
+// 15:00
 package main
 
 // article day
@@ -7,8 +7,10 @@ package main
 import (
 	"flag"
 	"log"
+	"raftconsensus/pkg/store"
 	"strings"
 
+	"github.com/hashicorp/consul/command/operator/raft"
 	"github.com/hashicorp/raft"
 )
 
@@ -32,4 +34,24 @@ func main() {
 	if *peers != "" {
 		config.Peers = strings.Split(*peers, ",")
 	}
+
+	raftNode := raft.NewNode(config)
+
+	err := raftNode.StartRPCServer(*rpcAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	raftNode.Start()
+
+	store := store.NewStore(raftNode)
+
+	server := api.NewServer(store, raftNode)
+
+	go func() {
+		if err := server.Start(*httpAddr); err != nil {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
 }
