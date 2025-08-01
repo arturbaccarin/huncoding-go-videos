@@ -59,3 +59,41 @@ func (s *Store) Set(key string, value interface{}) error {
 
 	return nil
 }
+
+func (s *Store) Delete(key string) error {
+	cmd := Command{
+		Op:  "DELETE",
+		Key: key,
+	}
+
+	if _, err := json.Marshal(cmd); err != nil {
+		return err
+	}
+
+	s.mu.Lock()
+	delete(s.store, key)
+	s.mu.Unlock()
+
+	return nil
+}
+
+func (s *Store) applyComittedEntries() {
+	for {
+		select {
+		case entry := <-s.raft.GetApplyCh():
+			var cmd Command
+			if err := json.Unmarshal(entry.([]byte), &cmd); err != nil {
+				continue
+			}
+
+			s.mu.Lock()
+			switch cmd.Op {
+			case "SET":
+				s.store[cmd.Key] = cmd.Value
+			case "DELETE":
+				delete(s.store, cmd.Key)
+			}
+			s.mu.Unlock()
+		}
+	}
+}
