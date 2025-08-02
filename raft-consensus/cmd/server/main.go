@@ -2,8 +2,6 @@
 // 17:30
 package main
 
-// article day
-
 import (
 	"flag"
 	"log"
