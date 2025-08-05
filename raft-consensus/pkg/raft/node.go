@@ -161,4 +161,34 @@ func (n *Node) startElection() {
 			}
 		}(peer)
 	}
+
+	timeout := time.After(n.config.ElectionTimeout)
+	for {
+		select {
+		case <-votesCh:
+			votes++
+			log.Printf("Node %s received a vote, total votes: %d", n.config.ID, votes)
+
+			if votes > (len(n.config.Peers)/2 + 1) {
+				log.Printf("Node %s won the election for term %d with %d votes", n.config.ID, currentTerm, votes)
+				n.mu.Lock()
+
+				if n.state == Candidate && n.currentTerm == currentTerm {
+					n.becomeLeader()
+				}
+				n.mu.Unlock()
+				log.Printf("Node %s exiting startElection after becoming leader", n.config.ID)
+				return
+			}
+		case <-responsesCh:
+			if responses == len(n.config.Peers) {
+				log.Printf("Node %s received responses from all peers, total responses: %d", n.config.ID, responses)
+
+				return
+			}
+		case <-timeout:
+			log.Printf("Node %s election timeout after %v, exiting startElection", n.config.ID, n.config.ElectionTimeout)
+			return
+		}
+	}
 }
