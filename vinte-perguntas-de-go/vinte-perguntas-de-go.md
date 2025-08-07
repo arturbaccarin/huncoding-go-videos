@@ -52,18 +52,26 @@ O GC do Go minimiza as pausas, mas ainda precisa parar brevemente a aplicação 
 
 * Menos alocações = menos trabalho para o Garbage Collector, o que significa menos pausas e melhor desempenho.
 
-## 3. 
+## 3. Como você faria profiling e benchmarking para identificar gargalos em um programa concorrente em Go?
+
+Entra num ponto de performance que muitas vezes você tem que fazer no código.
+
+Basicamente pergunta como fazer um profiling, fazer um benchmark no seu código e verificar gargalos da sua aplicação, pelo menos inicialmente com a ferramenta.
+
+No momento que você cria um arquivo _test, você consegue criar funções teste e funções benchmark. E assim você já consegue testar performance por ele.
+
+Pacote profiling: vai verificar quanto de memória ele está utilizando em alta latência, em alta carga dentro do seu projeto. Ou reetorna o uso de CPU.
+
+## 4. O que são race conditions e como o Go te ajuda a identificá-los?
+
+Race conditions basicamente é quando você tem múltiplas go routines acessando um dado compartilhado.
+
+Comando go run -race e ele vai identificar quando tem race condition ali na execução.
+
+Consegue identificar que tem algum ponto, ele fala em qual linha possíveis race condition e assim por diante.
 
 ---
-Terceira pergunta. Como você faria por filing e
-04:27
-benchmarking para identificar gargalos em um programa concorrente em GO? Tá? Aqui é muito importante essa daqui porque entra num ponto de performance que muitas vezes você tem que fazer ali no código, tá? A gente tem vídeo de profiling aqui no canal, mas basicamente aqui a gente tá perguntando como a gente consegue fazer um profiling, fazer um benchmark no seu código e verificar gargalos ali da sua aplicação, pelo menos inicialmente com a ferramenta. Então a gente consegue utilizar o benchmark no pacote testing. Então você
-04:54
-coloca teste. Então no momento que você cria um arquivo underline test, você consegue criar funções teste e funções benchmark. E assim você já consegue testar performance por ele. O basicamente o pacote por filing do Gol que você consegue executar ele com menos bentch e o menos bch mesmo. Ele basicamente ele vai verificar quanto de memória ele está utilizando em alta latência, em alta carga ali dentro do seu projeto. Ou menos bent ele não te retorna memória, mas retorna o uso de CPU, tá? Então é um jeito que você
-05:20
-consegue fazer um profiling dentro do Gol, beleza? Com uma ferramenta de profiling do próprio Gol, que é o Gol Poof. Beleza? Então, quarta pergunta, o que são Reace conditions e como o GO te ajuda a identificá-los? Então, o que são rais conditions, o que ela significa? Isso muito importante, e como o go te ajuda a identificar isso? Então, rais condition basicamente é quando você tem múltiplas go routines acessando um dado compartilhado, por exemplo, que você tem dentro do seu código e o go ele te ajuda
-05:47
-a identificar isso utilizando uma flag menos race, tá? Você consegue dar um go run.gar Go e você consegue colocar um menos race ali dentro do seu código e ele vai identificar quando tem race condition ali na execução, beleza? E aí você consegue identificar que tem algum ponto, ele fala em qual linha possíveis condition e assim por diante. Beleza? Então é muito importante saber dessa resposta aqui também. Pergunta cinco. Como implementar um pool de grutines eficiente e quais são as boas práticas
+Pergunta cinco. Como implementar um pool de grutines eficiente e quais são as boas práticas
 06:13
 para isso? Então pool aqui de grotines é para você não criar grotine infinitamente, né? Então não quero que o meu código saia criando 1 milhão de grutine, porque grutin são sim leves, mas elas não são infinitas também. Então a gente tem que ter um limite ali e uma pool geralmente é utilizada para você fazer essa limitação, tá? Então você consegue fazer um uma sincronia de mensagens ali utilizando channels com buffer. Então é um dos jeitos de você fazer isso. Você pode utilizar o workers, então em vez de você criar 1
 06:39
