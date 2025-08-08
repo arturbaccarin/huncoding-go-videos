@@ -70,18 +70,53 @@ Comando go run -race e ele vai identificar quando tem race condition ali na exec
 
 Consegue identificar que tem algum ponto, ele fala em qual linha possíveis race condition e assim por diante.
 
+## 5. Como implementar um pool de gorotinas eficiente e quais são as boas práticas para isso?
+
+O pool serve para você não criar gorotinas inifinitamente. Elas são leves, mas não são infinitas.
+
+Consegue fazer uma sicronia de mensagens utilizando channels com buffer.
+
+Utilizar workers - você cria um channel que vira workers ai é possível criar um limite.
+
+Escala com o limite, 20 workers, 30 workers.
+
+## 6. Como funciona o escape analysis no compilador Go e qual seu impacto na performance?
+
+Escape analysis (ou análise de escape) é uma técnica usada por compiladores (como o do Go) para determinar se uma variável pode ser alocada na stack (pilha) ou se ela precisa ser alocada na heap (amontoado).
+
+Stack: alocação rápida, desalocação automática quando a função retorna.
+Heap: mais lenta (alocação via garbage collector), mas permite que a variável "escape" da função onde foi criada.
+
+O compilador do Go faz essa análise durante a compilação:
+
+* Se uma variável é retornada por uma função ou referenciada por uma goroutine, ela precisa viver além da execução atual → alocada na heap.
+
+* Se uma variável é usada apenas dentro da função onde foi declarada e não há referências externas → alocada na stack.
+
+```go
+type User struct {
+    name string
+}
+
+func newUser(name string) *User {
+    u := User{name: name}
+    return &u // variável 'u' escapa!
+}
+
+func printUser(name string) {
+    u := User{name: name}
+    fmt.Println(u) // 'u' não escapa
+}
+```
+
+Para saber se algo está escapando: `go run -gcflags="-m" main.go`
+
+Variáveis que vão para a heap dão overhead no GC.
+
+## 7. Quais são as armadilhas comuns ao usar canais com buffer e como evitá-las?
+
 ---
-Pergunta cinco. Como implementar um pool de grutines eficiente e quais são as boas práticas
-06:13
-para isso? Então pool aqui de grotines é para você não criar grotine infinitamente, né? Então não quero que o meu código saia criando 1 milhão de grutine, porque grutin são sim leves, mas elas não são infinitas também. Então a gente tem que ter um limite ali e uma pool geralmente é utilizada para você fazer essa limitação, tá? Então você consegue fazer um uma sincronia de mensagens ali utilizando channels com buffer. Então é um dos jeitos de você fazer isso. Você pode utilizar o workers, então em vez de você criar 1
-06:39
-milhão de grutines, você cria grutines que eu vi em channels, eles viram workers. É como se você tivesse criando um lista, uma fila ali dentro do seu código. E aí você consegue já gerenciar isso melhor. Você consegue criar menos grutines, né? Então você consegue fazer uma alimentação. Com os workers você consegue fazer um limite. Então quando você cria workers, você escala de uma forma com um limite. Então fala lá, escale 20 workers, 30 workers e não infinitos workers. Então fica melhor. Beleza? Pergunta seis. Como funciona o
-07:07
-escape analysis no compilador Go e qual seu impacto na performance? Tá? Então, como você consegue fazer análise de escape dentro do Gol e como isso afeta ou como isso pode te ajudar na questão de performance? Então, um compilador basicamente ele consegue decidir se uma variável vai ser alocada na stack, então na stack ali de memória para poder guardar essa variável ou se ela vai ser jogada pra HIP. Então, geralmente essas variáveis que que vão pra HIP, elas geralmente dão um overhead ali no garbage collector, tá? Então ela acaba
-07:33
-estourando o garbage collector porque toda hora tem hip, tem coisa para ele limpar, assim dizendo. Então, basicamente o GC ele tenta fazer um gerenciamento do que ele deve enviar ou não para HIP, porque quanto mais coisas no HIP, mais trabalho ele tem depois para poder fazer a limpeza do lixo, assim, vamos dizer, né? Então, basicamente, só para entender esse funcionamento de quando uma variável ou não é utilizada, como o garbage collector trabalha, aqui é uma pergunta mais rasa, mas é uma pergunta que pode
-07:58
-ser importante de ser feito, tá? Pergunta sete: Quais são as armadilhas comuns ao utilizar canais com buffer e como evitá-las? Essa daqui é muito boa, tá? Então, a gente tem os canais com buffer e sem buffer. Vou deixar, tem vídeo aqui no canal também, vou deixar aqui no card, beleza? Então, os canais com buffer quando você abre uma memória para poder colocar vários valores naquele channel. Quando não tem buffer, você basicamente coloca um valor de um para um. Então, eu só escrevo se alguém tiver lendo e só leio se alguém tiver
+Pergunta sete: Quais são as armadilhas comuns ao utilizar canais com buffer e como evitá-las? Essa daqui é muito boa, tá? Então, a gente tem os canais com buffer e sem buffer. Vou deixar, tem vídeo aqui no canal também, vou deixar aqui no card, beleza? Então, os canais com buffer quando você abre uma memória para poder colocar vários valores naquele channel. Quando não tem buffer, você basicamente coloca um valor de um para um. Então, eu só escrevo se alguém tiver lendo e só leio se alguém tiver
 08:23
 escrevendo. Beleza? Então, se você começar a ler num channel que não tem buffer, está vazio, você vai ficar preso lendo para sempre. E se você tá tentando escrever num buffer que não tem ninguém ouvindo, então você vai est escrevendo e esperando escrever para sempre, porque o buffer não tem listener, tá? Essa é a diferença. Agora, quando ele tem buffer, você consegue escrever e sair. Quando não tem buffer, você consegue ler e esperar alguém escrever, tá? Então, essas são as diferenças de buffer e com
 08:48
