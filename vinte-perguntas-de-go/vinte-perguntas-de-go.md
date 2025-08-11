@@ -107,13 +107,23 @@ Em sistemas concorrentes, como os programas Go, as race conditions podem ser ext
 
 ## 5. Como implementar um pool de gorotinas eficiente e quais são as boas práticas para isso?
 
-O pool serve para você não criar gorotinas inifinitamente. Elas são leves, mas não são infinitas.
+O objetivo de um pool de gorotinas é controlar a quantidade de gorotinas em execução simultaneamente, evitando o consumo excessivo de recursos que poderia ocorrer ao criar gorotinas de forma descontrolada. Embora gorotinas sejam leves em comparação com threads do sistema operacional, ainda assim consomem memória e agendam tarefas no runtime do Go, o que pode levar a problemas de performance ou até mesmo travamentos se forem criadas em excesso.
 
-Consegue fazer uma sicronia de mensagens utilizando channels com buffer.
+Uma forma eficiente de estruturar esse pool é utilizar channels com buffer como mecanismo de comunicação entre os produtores de tarefas e os workers. Os workers são gorotinas que ficam escutando o canal por novas tarefas a serem executadas. Ao criar um número fixo de workers — por exemplo, 10, 20 ou 30 — é possível limitar o grau de concorrência, o que traz previsibilidade ao uso de recursos.
 
-Utilizar workers - você cria um channel que vira workers ai é possível criar um limite.
+Essa abordagem também permite fazer uma sincronização natural entre quem envia e quem consome as tarefas, já que os channels bloqueiam ou esperam conforme seu buffer esteja cheio ou vazio. Além disso, o uso de channels evita a necessidade de bloqueios manuais com mutexes, reduzindo o risco de condições de corrida (race conditions).
 
-Escala com o limite, 20 workers, 30 workers.
+Algumas boas práticas importantes nesse contexto são:
+
+Evitar vazamentos de gorotinas: sempre garantir que uma gorotina worker possa ser encerrada corretamente quando o sistema for desligado ou o contexto for cancelado.
+
+Utilizar contextos com cancelamento: isso permite encerrar o processamento de forma limpa em caso de timeouts ou interrupções.
+
+Dimensionar corretamente o número de workers: deve ser baseado na natureza das tarefas e na capacidade da máquina. Tarefas I/O-bound podem suportar mais workers que tarefas CPU-bound.
+
+Monitorar o desempenho: observar métricas como o tempo de execução das tarefas, uso de memória e quantidade de gorotinas ativas ajuda a ajustar o tamanho do pool dinamicamente, se necessário.
+
+Com isso, você consegue um sistema concorrente robusto, eficiente e sustentável, sem cair na armadilha de criar gorotinas indiscriminadamente.
 
 ## 6. Como funciona o escape analysis no compilador Go e qual seu impacto na performance?
 
@@ -182,14 +192,40 @@ O Go introduziu generics em versões mais recentes, o que permite criar funçõe
 O uso excessivo de interface{} pode gerar um impacto de performance devido ao overhead de boxing/unboxing e às verificações de tipo em tempo de execução. Se você usar interface{} constantemente, o Go terá que constantemente verificar o tipo real do valor armazenado e, em alguns casos, fazer o casting para o tipo correto. Esse processo pode ser relativamente caro, especialmente se for feito em grande escala ou em operações críticas de desempenho.
 
 
+## 9. Como você estruturaria um sistema de microsserviços em Go para garantir escabilidade e resiliência?
 
-Pergunta nove. Como você estruturaria um sistema de microsserviços em Go para garantir escabilidade e resiliência? Então aqui como você cria um sistema de microsserviço para garantir que você escale ou ele fique resiliente, que ele remova recursos, que ele realmente não fique com recursos executando depois de terminar e assim por diante. Então aqui a gente pode entrar no contexto do context, tá? Que é muito poderoso aqui
-11:25
-em go. Então a gente pode utilizar context para colocar deadline, para utilizar use cancel para poder matar grotines que estão executando. Assim a gente melhora a questão de performance e uso de recursos. A gente pode utilizar trace Ability para colocar logs, open telemetry, por exemplo, para colocar B3CD com a questão do Zipkin, por exemplo. A gente pode colocar secretaker, rate limits nos routers para poder implementar rate limit, secret breaker dentro do seu projeto para para ele parar de ficar tentando várias vezes
-11:54
-quando ele perceber que é um problema. A gente pode utilizar mensagens assíncronas e filas ao invés de colocar métodos diretos para poder fazer requisições diretas. Aí você causa um problema em massa porque você não tem utilização e uma resiliência no seu projeto. Pessoa escrevo várias mensagens, elas todas me tornam 500. Depois eu não consigo reprocessar. Então com filas você consegue trabalhar melhor isso. Aqui entra um pouco de arquitetura, mas é um bom pensamento ali para trazer para uma entrevista, beleza?
-12:19
-Ou que pode te trazer caso você tiver participando como candidato. Pergunta 10: qual é o modelo de memória em GO? como garantir visibilidade e evitar riscondition, tá? Então entra um pouco com aquela outra pergunta que basicamente aqui vai entrar um pouquinho. Basicamente a pergunta é como evita riscondition. Aqui a forma de evitar são várias, mas a em geral se a pessoa se você conseguir responder Mtex geralmente já vai ser muito bom, tá? Claro que ela vai estender muito mais do que isso, porque Mutex pode causar
+A construção de um sistema de microsserviços escalável e resiliente em Go exige atenção tanto à implementação quanto à arquitetura. O objetivo é garantir que cada serviço consiga lidar com alta carga, falhas e consumo eficiente de recursos, mantendo a estabilidade geral do sistema.
+
+Um dos pontos-chave é o uso adequado do pacote context. Ele permite controlar o tempo de vida de requisições, colocando timeouts e deadlines claros, além de permitir o cancelamento de gorotinas que não precisam mais ser executadas. Isso ajuda a liberar recursos rapidamente e evita vazamentos de memória ou processamento desnecessário. Usar context.WithCancel ou context.WithTimeout em chamadas a outros serviços ou rotinas internas é uma prática fundamental.
+
+Além disso, para aumentar a resiliência e facilitar o rastreamento de problemas, é importante implementar observabilidade. Isso inclui o uso de traceabilidade distribuída, com ferramentas como OpenTelemetry integradas a soluções como Zipkin ou Jaeger. Elas permitem que você veja o caminho completo de uma requisição entre serviços, identificando gargalos ou falhas rapidamente. Logs estruturados e métricas também são essenciais para esse monitoramento.
+
+Outro aspecto essencial é a aplicação de padrões de resiliência, como:
+
+Rate limiting: protege seu serviço contra sobrecarga limitando o número de requisições por segundo, geralmente implementado no gateway ou diretamente nos handlers HTTP.
+
+Circuit breaker: evita que um serviço continue tentando se comunicar com outro que está falhando, reduzindo a propagação de falhas em cadeia.
+
+Retries com backoff exponencial: úteis, mas devem ser usados com cautela para não amplificar o problema em momentos de falha generalizada.
+
+Para garantir escalabilidade e desacoplamento entre serviços, mensageria assíncrona com filas (como Kafka, RabbitMQ ou NATS) deve ser considerada no lugar de chamadas HTTP diretas sempre que possível. Isso melhora a resiliência, porque os dados não se perdem em caso de falha temporária do consumidor, e também permite escalar consumidores independentemente dos produtores.
+
+Do ponto de vista de arquitetura, boas práticas incluem:
+
+Divisão clara de responsabilidades entre serviços, com APIs bem definidas.
+
+Deploys independentes, favorecendo o uso de contêineres com Docker e orquestração com Kubernetes.
+
+Descoberta de serviços e balanceamento de carga, com soluções como service mesh (ex: Istio) ou service discovery via Consul.
+
+Gerenciamento seguro de configurações e segredos, utilizando ferramentas como Vault ou sistemas de configuração dinâmica.
+
+
+## 10. Como você estruturaria um sistema de microserviços em Go para garantir escalabilidade e resiliência?
+
+
+------
+Pergunta 10: qual é o modelo de memória em GO? como garantir visibilidade e evitar riscondition, tá? Então entra um pouco com aquela outra pergunta que basicamente aqui vai entrar um pouquinho. Basicamente a pergunta é como evita riscondition. Aqui a forma de evitar são várias, mas a em geral se a pessoa se você conseguir responder Mtex geralmente já vai ser muito bom, tá? Claro que ela vai estender muito mais do que isso, porque Mutex pode causar
 12:46
 questão de lock novamente, questão de dead lock, porque nunca vai soltar aquele MTEX ou você começa a adquirir tanto Miltex, tanto Miltex, que você trava sua aplicação inteira. E ela nunca vai soltar porque você travou todo mundo, todas as variáveis com Mtex, né? Tem um vídeo aqui de lock free também que eu gravei no canal que também fala um pouquinho sobre formatos para você não utilizar Mtex em todo canto na sua aplicação. Então tem outros formatos ali para você utilizar, mas o Mtex em geral vai responder bem essa pergunta, tá?
 13:12
