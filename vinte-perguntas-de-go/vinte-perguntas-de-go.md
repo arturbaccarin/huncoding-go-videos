@@ -202,21 +202,21 @@ Além disso, para aumentar a resiliência e facilitar o rastreamento de problema
 
 Outro aspecto essencial é a aplicação de padrões de resiliência, como:
 
-Rate limiting: protege seu serviço contra sobrecarga limitando o número de requisições por segundo, geralmente implementado no gateway ou diretamente nos handlers HTTP.
+* Rate limiting: protege seu serviço contra sobrecarga limitando o número de requisições por segundo, geralmente implementado no gateway ou diretamente nos handlers HTTP.
 
-Circuit breaker: evita que um serviço continue tentando se comunicar com outro que está falhando, reduzindo a propagação de falhas em cadeia.
+* Circuit breaker: evita que um serviço continue tentando se comunicar com outro que está falhando, reduzindo a propagação de falhas em cadeia.
 
-Retries com backoff exponencial: úteis, mas devem ser usados com cautela para não amplificar o problema em momentos de falha generalizada.
+* Retries com backoff exponencial: úteis, mas devem ser usados com cautela para não amplificar o problema em momentos de falha generalizada.
 
 Para garantir escalabilidade e desacoplamento entre serviços, mensageria assíncrona com filas (como Kafka, RabbitMQ ou NATS) deve ser considerada no lugar de chamadas HTTP diretas sempre que possível. Isso melhora a resiliência, porque os dados não se perdem em caso de falha temporária do consumidor, e também permite escalar consumidores independentemente dos produtores.
 
 Do ponto de vista de arquitetura, boas práticas incluem:
 
-Divisão clara de responsabilidades entre serviços, com APIs bem definidas.
+* Divisão clara de responsabilidades entre serviços, com APIs bem definidas.
 
-Deploys independentes, favorecendo o uso de contêineres com Docker e orquestração com Kubernetes.
+* Deploys independentes, favorecendo o uso de contêineres com Docker e orquestração com Kubernetes.
 
-Descoberta de serviços e balanceamento de carga, com soluções como service mesh (ex: Istio) ou service discovery via Consul.
+* Descoberta de serviços e balanceamento de carga, com soluções como service mesh (ex: Istio) ou service discovery via Consul.
 
 Gerenciamento seguro de configurações e segredos, utilizando ferramentas como Vault ou sistemas de configuração dinâmica.
 
