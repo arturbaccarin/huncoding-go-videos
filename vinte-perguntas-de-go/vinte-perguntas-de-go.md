@@ -328,27 +328,40 @@ Portanto, os channels em Go são ferramentas poderosas e versáteis para coorden
 
 
 
-## 15. 
+## 15. Para que serve o pacote context e como ele pode ser usado para gerenciar deadlines, cancelamentos e propagação de dados?
+
+O pacote context em Go serve para controlar o ciclo de vida de processos, especialmente em aplicações concorrentes. Ele é amplamente utilizado para gerenciar deadlines (prazos de execução), cancelamentos e propagação de informações entre goroutines. O contexto é imutável, o que significa que, uma vez criado, ele não muda. Quando é necessário alterar algum aspecto, como adicionar um deadline ou um cancelamento, cria-se um novo contexto baseado no anterior, mantendo a cadeia de herança entre eles.
+
+Uma das principais utilidades do context é permitir o cancelamento em cascata. Quando um contexto com cancelamento é criado e, em algum momento, a função cancel() é chamada, todas as funções ou goroutines que receberam esse contexto — ou um contexto derivado dele — são notificadas sobre o cancelamento. Isso é fundamental para evitar vazamento de recursos e encerrar tarefas desnecessárias, especialmente em sistemas distribuídos ou aplicações com muitas rotinas concorrentes.
+
+Outro ponto importante é a convenção em Go de passar o context.Context como o primeiro parâmetro de funções que fazem operações potencialmente longas ou bloqueantes. Isso garante que toda a cadeia de execução compartilhe o mesmo contexto ou um contexto derivado, tornando possível coordenar o cancelamento e respeitar deadlines de forma consistente em toda a aplicação.
+
+
+
+## 16. Como funciona o mecanismo de defer e em que situações ele é crucial para evitar leaks de recursos?
+
+O mecanismo de defer em Go é utilizado para adiar a execução de uma função até o final da execução da função em que o defer foi chamado. Ou seja, mesmo que o código retorne antecipadamente, todas as chamadas defer serão executadas logo após o retorno, garantindo que certos trechos de código sempre rodem, independentemente de como a função termina.
+
+O defer é crucial para evitar leaks de recursos porque permite que você libere recursos assim que eles são alocados, de forma segura e automática. Por exemplo, ao abrir uma conexão com um banco de dados ou abrir um arquivo, você pode usar defer logo em seguida para garantir que esse recurso será fechado, mesmo que ocorram erros ou returns prematuros na função. Isso ajuda a evitar que recursos fiquem abertos indefinidamente, causando vazamentos de memória ou bloqueios desnecessários.
+
+Um ponto interessante é a ordem de execução dos defers. Eles seguem uma ordem LIFO (Last-In, First-Out), ou seja, o último defer declarado será o primeiro a ser executado. Isso é importante em situações em que você precisa garantir que os recursos sejam liberados na ordem inversa à qual foram adquiridos.
+
+Portanto, o defer é uma ferramenta essencial para manter o código limpo, seguro e à prova de vazamentos de recursos, especialmente em operações que envolvem abertura e liberação de conexões, arquivos, goroutines ou containers em testes.
+
+## 17. Como implementar injeção de dependências em Go para garantir testabilidade e baixo acoplamento?
+
+Para implementar injeção de dependência em Go de forma eficiente, o ideal é estruturar o código de forma que os componentes sejam criados e passados explicitamente por meio de construtores. Em Go, como não há um sistema de injeção automático embutido na linguagem, a abordagem manual é a mais comum: cada camada da aplicação (como service, repository, use case, controller) define um construtor que recebe suas dependências como parâmetros e retorna uma instância da struct correspondente.
+
+Essa abordagem manual favorece o baixo acoplamento e a alta testabilidade, pois permite trocar facilmente implementações reais por mocks durante os testes. Basta passar um mock da dependência no lugar da real, sem alterar o código da aplicação.
+
+Além da abordagem manual, também é possível utilizar bibliotecas como o Google Wire, que automatiza a injeção de dependência sem sacrificar a simplicidade do código. O Wire analisa os construtores definidos e, com base neles, gera código Go puro para resolver as dependências, sem usar reflection em tempo de execução. Isso permite manter a performance e a segurança do código, além de facilitar a montagem de estruturas complexas.
+
+Portanto, seja com construtores manuais ou com ferramentas como o Wire, a injeção de dependência em Go é uma prática fundamental para manter o código desacoplado, modular e fácil de testar.
+
+
+
 -----
 
-
-
-
-Pergunta 15. Para que serve o pacote Context e como ele pode ser usado para gerenciar deadlines, cancelamentos e propagação de dados? Entra um pouco com uma outra pergunta. Então, basicamente, o context ele é imutável. A partir do momento que você cria um contexto, ele não muda. Não muda mais, a não ser que você crie um contexto a partir desse original. Então, no momento que você cria um contexto com cancelamento e você executa o cancel,
-17:44
-todas as pessoas que receberam contexto por parâmetro vão receber essa notificação de cancelamento. Por isso que em go é importante você receber o context em todos os métodos como primeiro parâmetro, tá? De forma o o padrão ali do goxto seja sempre o primeiro parâmetro, tá? Então, como ele é imutável, todo mundo que recebeu o contexto, mesmo que tenha criado um contexto em cima desse que ele recebeu, ele vai receber essa notificação de cancel e é assim que ele basicamente gerencia ali o cancelamento e o deadline
-18:12
-dentro do seu projeto, enviando uma mensagem e garantindo que todo mundo vai receber ela, porque todos todas as pessoas ali, todas as partes do seu código tem o mesmo valor do Miltex imutável, mesmo que tenha criado o outro em cima dele. Beleza? 
-
-
-
-Pergunta 16. Como funciona o mecanismo de Differ? em que situações ele é crucial para evitar leakso, tá? Então o defer aqui, como se você não conhece, basicamente é uma palavrinha que você coloca no go que ele sempre vai executar no fim do seu código, tá? Então você coloca defer,
-18:41
-quando tudo terminar depois do return ele vai executar essa função que você colocou no defer, tá? Vale lembrar, se você quiser deixar essa pergunta mais difícil, você vale lembrar o seguinte: qual é a ordem que o defer cria? Então se eu colocar três de fur, um embaixo do outro, quem vai executar primeiro? o primeiro que eu coloquei de fur ou o último, tá? E e aqui a resposta basicamente é que o defer é um lifo, tá? Então o último que você dor é o primeiro que vai ser executado quando o método terminar. Então ele vai basicamente
-19:09
-ajudar você com link de recurso ou evitar líquid de recurso, porque no momento que eu cria conexão com banco de dados, eu posso logo em seguida colocar um defer para desligar ela. Ou então eu crio um teste contêiner no meu teste, eu posso logo em seguida colocar um defer para remover esse contêiner. Então, evita que eu esqueça de colocar esse código ou coloque numa parte do código que nunca vai chegar. Às vezes eu coloquei um return antes de executar o código que remove esse contêiner, que tira a conexão. Então eu posso
-19:35
-basicamente retornar ele e colocar ele para evitar que isso aconteça. Beleza? 
 
 
 
