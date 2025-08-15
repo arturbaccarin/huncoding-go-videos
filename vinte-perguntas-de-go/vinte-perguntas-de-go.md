@@ -360,30 +360,52 @@ Portanto, seja com construtores manuais ou com ferramentas como o Wire, a injeç
 
 
 
+## 18. Como o pacote sync pode ser usado para gerenciar concorrência e quais são as principais primitivies que ele oferece?
+
+O pacote sync da linguagem Go é utilizado para gerenciar concorrência de forma eficiente e segura, oferecendo primitivas que controlam o acesso a recursos compartilhados entre múltiplas goroutines. Entre as principais primitivas, destaca-se o Mutex, que serve para evitar condições de corrida ao garantir que apenas uma goroutine por vez possa acessar uma determinada seção crítica do código, prevenindo inconsistências em variáveis compartilhadas.
+
+Outra primitiva importante é o WaitGroup, que permite aguardar que um conjunto de goroutines finalize sua execução. Com ele, é possível iniciar diversas goroutines e apenas prosseguir quando todas tiverem sinalizado que terminaram, o que elimina a necessidade de usar esperas arbitrárias com tempos fixos ou randômicos.
+
+O Once é utilizado para garantir que um trecho de código seja executado apenas uma única vez, mesmo que várias goroutines tentem executá-lo simultaneamente. Isso é útil, por exemplo, para inicializações únicas e seguras de recursos.
+
+Já a estrutura Cond permite a comunicação e sincronização entre goroutines por meio de notificações em massa. Com ela, é possível suspender a execução de uma goroutine até que uma determinada condição seja satisfeita e sinalizada, funcionando de forma similar a canais, mas com maior controle sobre as notificações.
+
+Essas primitivas são fundamentais para evitar problemas comuns em programas concorrentes, como condições de corrida, deadlocks e inconsistências nos dados.
+
+No contexto da programação, "primitivas" (ou primitives, em inglês) são as estruturas ou operações mais básicas e fundamentais fornecidas por uma linguagem ou biblioteca para realizar uma determinada tarefa.
+
+Quando falamos em primitivas de concorrência, estamos nos referindo aos blocos básicos que uma linguagem ou pacote (como o sync em Go) oferece para controlar a execução simultânea de múltiplas tarefas (goroutines, no caso de Go). Elas ajudam a sincronizar, coordenar e proteger o acesso a recursos compartilhados, garantindo que o programa funcione corretamente mesmo com várias execuções ao mesmo tempo.
+
+Exemplos de primitivas de concorrência no pacote sync:
+
+* Mutex: impede que duas goroutines acessem uma variável ao mesmo tempo.
+
+* WaitGroup: espera um conjunto de goroutines terminar.
+
+* Once: garante que uma ação ocorra apenas uma vez, mesmo que chamada várias vezes simultaneamente.
+
+* Cond: permite que goroutines esperem por certas condições antes de continuar.
+
+Essas primitivas funcionam como ferramentas de baixo nível, sobre as quais estruturas mais complexas de concorrência podem ser construídas.
+
+
+
+## 19. Como o Go trata operações de tempo (timers, deadlines, timeouts) e quais são os principais padrões para usá-los corretamente? 
+
+
+
 -----
 
 
-
-
-Pergunta 17. Como implementar a injeção de dependências em GO para garantir ter estabilidade de baixo acoplamento? Então, como a gente pode implementar uma injeção de dependência em GO eficiente? Basicamente isso. Em gestão do Gol a gente sabe que é um pouco humorosa, que a gente precisa ficar criando métodos construtores que retornam uma struct. Essa structar um por parâmetro do outro, por parâmetro do outro. Então aqui a gente pode
-20:05
-utilizar parâmetros e construtores se a gente quiser fazer isso na mão. E basicamente a gente cria construtores dentro de cada parte do código, service, repositor, us case, controller e assim por diante. E aí a gente consegue utilizar isso de forma manual, porém a gente consegue utilizar bibliotecas como Google Wire, por exemplo. Então o Google Wire ele vai basicamente utilizar reflection go para saber quais variáveis já foram inicializadas e quais construtores precisam daquelas variáveis que já foram inicializadas para serem
-20:31
-enviadas por parâmetro. Beleza? Então a gente consegue responder aqui dessa forma. Algo simples aqui, mas só pra gente saber como funciona, tá? 
-
-
-
-Pergunta 18. Como o pacote Sync pode ser utilizado para gerenciar concorrência e quais são os principais permitíveis que ele oferece, tá? Então aqui a gente tem um pacote Sc e a gente tá basicamente perguntando quais são as partes principais que a gente consegue utilizar dele. Então a gente tem basicamente o 11, o condition e o H group aqui que são os principais fora o Mtex que a gente já
-20:56
-conversou. Então o Mutex muito importante para evitar aqui da gente utilizar a mesma variável, ficar inconsistente dentro do nosso código, tá? A gente tem o W group, que é para basicamente notificar várias grutines de que algo tem que ser terminado. Então você cria 20 grutines. Ao invés de você criar um tempo randômico para esperar as 20, você recebe 20 sinais de dano e aí você consegue terminar o seu código sabendo que as 20 grotines terminaram de executar. Aí você tem o 11, que ele basicamente vai fazer uma inicialização
-21:24
-única. Então, ao invés de eu garantir que várias partes do meu código estão criando uma inicialização de uma variável, eu consigo colocar um 11. E independente do que aconteça, vai inicializar apenas uma vez dentro do seu código, tá? E você tem um conde para enviar notificações em massa aqui para várias grouines, beleza? Como se a gente tivesse utilizando o channel aqui também. Então, a gente tem esses principais pacotes ali, essas principais funções dentro do pacote syc. Beleza? Então, como o Gold trata operações de
+19. como o Gold trata operações de
 21:49
 tempo, isso aqui é muito importante também, e quais são os principais padrões para usá-lo corretamente? Então o pacote time aqui ele oferece o ticker e o after. Então aqui o after basicamente como o nome já diz, ele fala depois de tanto tempo envie uma notificação ou faça algo então time ponto after ele basicamente vira um channel que te retorna uma mensagem quando esse determinado tempo passar. Geralmente você coloca ele dentro de um select e você recebe uma notificação ali e você faz o que tem que fazer quando
 22:16
 esse tempo terminar de passar. Beleza? Já o ticker ele é uma função do time, do after que nesse caso, só que ele vai enviar a mesma notificação a cada tempo. Então o after a cada 20 segundos ele vai te enviar uma mensagem e vai parar. O ticker você vai colocar 20 segundos. Então a cada 20 segundos ele vai fazer alguma coisa para você. Então ah, a cada 20 segundos me envie uma mensagem. A cada 20 segundos coloque um logger. Aí você vai colocar os dois num select. E aí quando algo acontecer no after, ele
 22:41
-vai executar apenas uma vez e pronto. No ticker, a cada x tempos, ele vai executar aquilo que você pedir para ele. Beleza? Então ele vai ficar ficar fazendo tics de tempo para você, vamos assim dizer. Beleza? E última pergunta. Quais as melhores práticas para escrever testes concorrentes em go e evitar falsos positivos ou negativos? Então, no GO você tem o testem ponto t e dentro dessa variável t você consegue ter o t. Perlol, beleza? Então ele vai executar basicamente seus códigos de forma concorrente aqui, de forma paralela aqui
+vai executar apenas uma vez e pronto. No ticker, a cada x tempos, ele vai executar aquilo que você pedir para ele. Beleza? Então ele vai ficar ficar fazendo tics de tempo para você, vamos assim dizer. Beleza? E última pergunta. 
+
+20. Quais as melhores práticas para escrever testes concorrentes em go e evitar falsos positivos ou negativos? Então, no GO você tem o testem ponto t e dentro dessa variável t você consegue ter o t. Perlol, beleza? Então ele vai executar basicamente seus códigos de forma concorrente aqui, de forma paralela aqui
 23:10
 tem executados ao mesmo tempo, tá? E aí, como você garante que você está evitando falas positivo, riscondition, você consegue executar com menos race os seus testes. Aí você garante que não tem riscondition entre os seus testes também, beleza? Isso no go é possível. E você consegue isolar os dados dessas variáveis, porque como tem vários testes executando ao mesmo tempo, se você colocar uma variável compartilhada, vão estar todos os testes alterando ao mesmo tempo. Então você consegue isolar, coloque variáveis de de contexto local
 23:37
