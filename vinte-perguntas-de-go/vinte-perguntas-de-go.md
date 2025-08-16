@@ -392,18 +392,13 @@ Essas primitivas funcionam como ferramentas de baixo nível, sobre as quais estr
 
 ## 19. Como o Go trata operações de tempo (timers, deadlines, timeouts) e quais são os principais padrões para usá-los corretamente? 
 
+O Go trata operações de tempo utilizando principalmente o pacote time, que oferece ferramentas como time.After e time.Ticker. O time.After cria um canal que envia uma única notificação após um determinado período. Essa notificação geralmente é utilizada dentro de um bloco select, permitindo que o programa realize uma ação específica quando o tempo se esgotar. Esse padrão é útil para implementar timeouts simples em operações que podem demorar, garantindo que o sistema continue funcionando caso algo demore demais.
 
+Já o time.Ticker serve para ações periódicas. Ele envia notificações em intervalos regulares, permitindo que algo seja executado repetidamente a cada determinado tempo. Assim como o After, o Ticker também é geralmente utilizado dentro de um select, e é comum em situações como logging periódico, tarefas agendadas ou verificação contínua de algum estado.
+
+O uso correto desses padrões envolve sempre cuidar do controle de concorrência, utilizando select para aguardar múltiplos canais e evitando vazamentos de goroutines — especialmente ao garantir que tickers sejam interrompidos com Stop() quando não forem mais necessários.
 
 -----
-
-
-19. como o Gold trata operações de
-21:49
-tempo, isso aqui é muito importante também, e quais são os principais padrões para usá-lo corretamente? Então o pacote time aqui ele oferece o ticker e o after. Então aqui o after basicamente como o nome já diz, ele fala depois de tanto tempo envie uma notificação ou faça algo então time ponto after ele basicamente vira um channel que te retorna uma mensagem quando esse determinado tempo passar. Geralmente você coloca ele dentro de um select e você recebe uma notificação ali e você faz o que tem que fazer quando
-22:16
-esse tempo terminar de passar. Beleza? Já o ticker ele é uma função do time, do after que nesse caso, só que ele vai enviar a mesma notificação a cada tempo. Então o after a cada 20 segundos ele vai te enviar uma mensagem e vai parar. O ticker você vai colocar 20 segundos. Então a cada 20 segundos ele vai fazer alguma coisa para você. Então ah, a cada 20 segundos me envie uma mensagem. A cada 20 segundos coloque um logger. Aí você vai colocar os dois num select. E aí quando algo acontecer no after, ele
-22:41
-vai executar apenas uma vez e pronto. No ticker, a cada x tempos, ele vai executar aquilo que você pedir para ele. Beleza? Então ele vai ficar ficar fazendo tics de tempo para você, vamos assim dizer. Beleza? E última pergunta. 
 
 20. Quais as melhores práticas para escrever testes concorrentes em go e evitar falsos positivos ou negativos? Então, no GO você tem o testem ponto t e dentro dessa variável t você consegue ter o t. Perlol, beleza? Então ele vai executar basicamente seus códigos de forma concorrente aqui, de forma paralela aqui
 23:10
