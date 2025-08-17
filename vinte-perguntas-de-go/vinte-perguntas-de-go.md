@@ -399,6 +399,7 @@ Já o time.Ticker serve para ações periódicas. Ele envia notificações em in
 O uso correto desses padrões envolve sempre cuidar do controle de concorrência, utilizando select para aguardar múltiplos canais e evitando vazamentos de goroutines — especialmente ao garantir que tickers sejam interrompidos com Stop() quando não forem mais necessários.
 
 -----
+;; commit of the day
 
 20. Quais as melhores práticas para escrever testes concorrentes em go e evitar falsos positivos ou negativos? Então, no GO você tem o testem ponto t e dentro dessa variável t você consegue ter o t. Perlol, beleza? Então ele vai executar basicamente seus códigos de forma concorrente aqui, de forma paralela aqui
 23:10
