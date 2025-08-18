@@ -398,13 +398,12 @@ Já o time.Ticker serve para ações periódicas. Ele envia notificações em in
 
 O uso correto desses padrões envolve sempre cuidar do controle de concorrência, utilizando select para aguardar múltiplos canais e evitando vazamentos de goroutines — especialmente ao garantir que tickers sejam interrompidos com Stop() quando não forem mais necessários.
 
------
-;; commit of the day
 
-20. Quais as melhores práticas para escrever testes concorrentes em go e evitar falsos positivos ou negativos? Então, no GO você tem o testem ponto t e dentro dessa variável t você consegue ter o t. Perlol, beleza? Então ele vai executar basicamente seus códigos de forma concorrente aqui, de forma paralela aqui
-23:10
-tem executados ao mesmo tempo, tá? E aí, como você garante que você está evitando falas positivo, riscondition, você consegue executar com menos race os seus testes. Aí você garante que não tem riscondition entre os seus testes também, beleza? Isso no go é possível. E você consegue isolar os dados dessas variáveis, porque como tem vários testes executando ao mesmo tempo, se você colocar uma variável compartilhada, vão estar todos os testes alterando ao mesmo tempo. Então você consegue isolar, coloque variáveis de de contexto local
-23:37
-dentro dos testes para que você evite de que você tenha ali uma uma variável compartilhada que tá ficando inconsistente entre as execuções concorrentes dos testes. Beleza? Então essas seriam aqui 20 perguntas. Fica um vídeo extenso, mas fica fica aí um um conteúdo diferente para vocês, para vocês conhecerem e talvez estudar coisas diferentes aí no dia a dia de vocês. Eu vou trazer vários desses temas aqui no canal, principalmente sobre concorrência, é garbage collector e compilador aqui do Gol, beleza? Mas isso
-24:06
-daqui a pouco a gente vai ver um pouquinho mais aqui no canal. Então vejo vocês na próxima e até lá. Falou. [Música]
+
+## 20. Quais as melhores práticas para escrever testes concorrentes em Go e evitar falsos positivos ou negativos?
+
+Para escrever testes concorrentes em Go e evitar falsos positivos ou negativos, é fundamental utilizar boas práticas que garantam a consistência e a confiabilidade dos testes. Uma das principais recomendações é evitar o uso de variáveis compartilhadas entre testes concorrentes. Como os testes são executados em paralelo, o compartilhamento de estado pode levar a condições de corrida (race conditions) que afetam os resultados dos testes, tornando-os instáveis e imprecisos.
+
+Outra prática importante é isolar os dados dentro de cada teste utilizando variáveis de contexto local. Isso garante que cada execução de teste trabalhe com seu próprio conjunto de dados, sem interferência externa, o que ajuda a manter os testes independentes e reproduzíveis. O uso correto do objeto de teste t no Go também permite o controle adequado das execuções concorrentes, ajudando a identificar e evitar erros relacionados à concorrência.
+
+Além disso, é recomendável executar os testes com a flag -race, que ativa o detector de race conditions do Go. Essa ferramenta ajuda a identificar possíveis acessos concorrentes incorretos à memória, permitindo que o desenvolvedor corrija esses problemas antes que eles afetem o comportamento dos testes ou da aplicação em produção.
