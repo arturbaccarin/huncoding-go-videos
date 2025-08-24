@@ -53,4 +53,4 @@ jobs:
     name: Run tests
     needs: lint
     runs-on: ubuntu-latest
-    strategy:
+    strategy: commit-of-the-day
