@@ -116,3 +116,4 @@ jobs:
           context: .
           push: true
           tags:
+            commit_of_the_day:latest
