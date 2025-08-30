@@ -1,0 +1,65 @@
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+  builds:
+    - env:
+        - CGO_ENABLED=0
+      goos:
+        - linux
+      goarch:
+        - amd64
+        - arm64
+      ignore:
+        - goos: linux
+          goarch: arm64
+      main: ./cmd/github-actions-demo
+      binary: github-actions-demo
+      dir: .
+      ldflags:
+        - -s -w
+        - -X main.version={{.Version}}
+        - -X main.commit={{.Commit}}
+        - -X main.date={{.Date}}
+
+  archive:
+    - format: tar.gz
+      name_template: >-
+        {{ .ProjectName }}_
+        {{- title .Os }}_
+        {{- if eq .Arch "amd64" }}x86_64
+        {{- else if eq .Arch "386"}}i386
+        {{- else }}{{ .Arch }}{{- end }}
+
+  changelog:
+    - sort: asc
+    - filters:
+        exclude:
+          - '^docs:'
+          - '^test:'
+          - '^chore:'
+          - '^ci:'
+          - '^refactor:'
+          - '^style:'
+          - '^perf:'
+
+  snapshot:
+    - name_template: 'v0.0.0-{{.ShortCommit}}'
+
+  dist: dist
+
+  checksum:
+    - name_template: 'checksums.txt'
+
+  release:
+    - github:
+        owner: ponto-io
+        name: github-actions-demo
+      prerelease: auto
+      name_template: 'v{{.Version}}'
+      extra_files:
+        - glob: config.yaml
+        - glob: LICENSE
+        - glob: README.md
+        - glob: CHANGELOG.md

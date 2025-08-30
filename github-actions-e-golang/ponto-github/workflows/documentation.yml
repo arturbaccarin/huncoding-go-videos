@@ -78,3 +78,12 @@ jobs:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
           folder-path: 'docs'
+      
+      - name: Check spelling
+        uses: rojopolis/spellcheck-github-action@v0.19.0
+        with:
+          source_files: 'docs/**/*.md'
+          task_name: 'Spell Check Documentation'
+          use_gitignore: 'true'
+          use_ignore_words_list: 'true'
+          ignore_words_list: '.spellcheck-ignore-words.txt'
