@@ -1,7 +1,7 @@
 Link do vídeo: [https://youtu.be/liID0DWCuvE](https://youtu.be/liID0DWCuvE)
 
 Viajando, logo mais volto!
-agora resolvendo coisas da unip décimo quinto dia
+agora resolvendo coisas da unip décimo sexto dia
 
 00:00
 E aí pessoal, tudo bem? Mais um vídeo aqui sobre Gol e a gente vai falar um pouquinho sobre como é possível o compilador em Go ser escrito em Go, tá? Então a gente vai começar a ter assuntos aqui sobre compiladores e garbage collector no canal. E hoje a gente vai começar com esse ponto do como é possível, como funciona o compilador do Gol para que ele seja escrito em Go. Mas como isso é possível, como isso acontece, né? Então a gente vai falar um pouquinho hoje sobre bootstrapping, sobre compilador e sobre como um
